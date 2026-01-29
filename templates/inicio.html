@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>COMAP – Plataforma Oficial</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: url('{{ url_for("static", filename="fondo_inicio.jpg") }}') no-repeat center center fixed;
+    background-size: cover;
+}
+.container{
+    max-width:800px;
+    margin:50px auto;
+    padding:25px;
+    background: rgba(255,255,255,0.95);
+    border-radius:14px;
+    text-align:center;
+}
+.card{
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:25px;
+    margin:20px 0;
+}
+.card a{
+    display:inline-block;
+    margin-top:15px;
+    padding:12px 18px;
+    background:#004080;
+    color:white;
+    border-radius:6px;
+    text-decoration:none;
+}
+.card a:hover{ background:#0066cc; }
+
+.fb-card{
+    border:1px solid #ccc;
+    border-radius:12px;
+    padding:15px;
+    margin:20px 0;
+    text-align:left;
+}
+.fb-header{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+.fb-header img{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+}
+.fb-content{
+    margin-top:12px;
+    white-space:pre-wrap;
+}
+.fb-actions{
+    margin-top:10px;
+    text-align:right;
+}
+.fb-actions a{
+    color:#004080;
+    font-weight:bold;
+    text-decoration:none;
+}
+.fb-actions a:hover{ text-decoration:underline; }
+
+/* NUEVO: contenedor de accesos alineados */
+.cards-container{
+    display: flex;
+    justify-content: space-between; /* separa los dos card a los extremos */
+    gap: 20px;
+    margin-top: 30px;
+    text-align: left;
+}
+
+.cards-container .card{
+    flex: 1;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>COLEGIO DE MATEMÁTICOS DEL PERÚ REGIÓN PUNO</h2>
+<p>GESTIÓN 2026 - 2028 </p>
+
+<img src="{{ url_for('static', filename='banner_comap.jpg') }}"
+     style="width:50%; height:120px; object-fit:cover; border-radius:3px; margin-bottom:30px;">
+
+<!-- COMUNICADO PRINCIPAL -->
+<div class="fb-card">
+    <div class="fb-header">
+        <img src="{{ url_for('static', filename='insignia.png') }}"
+     style="width:100%; max-width:140px; height:auto; border-radius:10px; margin-bottom:20px;">
+        <div>
+            <strong>DECANATO COMAP</strong><br>
+            <small>{{ comunicado_fecha }}</small>
+        </div>
+    </div>
+
+    <div class="fb-content">
+        {{ comunicado_texto }}
+    </div>
+
+    {% if es_admin %}
+    <div class="fb-actions">
+        <a href="/editar_comunicado">✏️ Editar comunicado</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- COMUNICADOS ANTERIORES -->
+{% if comunicados %}
+<h3>📰 Comunicados anteriores</h3>
+{% for c in comunicados %}
+<div class="fb-card">
+    <div class="fb-header">
+        <img src="{{ url_for('static', filename='insignia.png') }}">
+        <div>
+            <strong>DECANATO COMAP</strong><br>
+            <small>{{ c.fecha }}</small>
+        </div>
+    </div>
+    <div class="fb-content">
+        {{ c.texto }}
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ACCESOS: consulta pública a la izquierda, administración a la derecha -->
+<div class="cards-container">
+    <div class="card">
+        <h3>🔍 Consulta pública</h3>
+        <p>Verifique habilitación</p>
+        <a href="/publico">Ingresar</a>
+    </div>
+
+    <div class="card">
+        <h3>🔐 Administración</h3>
+        <p>Acceso exclusivo del Decano</p>
+        <a href="/login">Ingresar</a>
+    </div>
+</div>
+
+</div>
+</body>
+</html>

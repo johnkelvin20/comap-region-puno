@@ -1,0 +1,24 @@
+certificados_flask/
+│
+├── app.py                  <-- Orquestador de rutas, ventana principal inicio.html
+├── app_helpers.py          <-- Funciones compartidas (Google Sheets, búsquedas)
+├── login.py                <-- Lógica de login/logout
+├── admin.py                <-- Lógica de administración y búsquedas admin
+├── publico.py              <-- Lógica de consulta pública
+├── overlay_pdf.py          <-- Funciones PDF (crear_overlay_pdf, fusionar_pdfs)
+├── plantilla.pdf           <-- Plantilla base del certificado
+├── OLDENGL.TTF             <-- Fuente para PDF
+├── credenciales.json       <-- Google Sheets
+│
+├── static/
+│   ├── fotos/
+│   ├── estilos.css
+│   ├── fondo_inicio.jpg
+│   ├── banner_comap.jpg
+│   └── insignia.png
+│
+└── templates/
+    ├── inicio.html          <-- Ventana principal
+    ├── login.html
+    ├── admin.html
+    ├── publico.html

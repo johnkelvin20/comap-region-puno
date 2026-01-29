@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verificación de Certificados COMAP</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+        background: url('{{ url_for("static", filename="plazapuno.jpg") }}') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 60px auto;
+        padding: 30px;
+        background: rgba(255,255,255,0.95);
+        border-radius: 12px;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+        text-align: center;
+        color: #003366;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        text-align: center;
+        font-weight: bold;
+        color: #004080;
+        margin-bottom: 25px;
+    }
+
+    form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+        flex: 1;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    button {
+        padding: 12px 20px;
+        border-radius: 6px;
+        border: none;
+        background: linear-gradient(135deg, #004080, #0066cc);
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    button:hover {
+        background: linear-gradient(135deg, #0066cc, #004080);
+    }
+
+    .alert {
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        display: none;
+    }
+
+    .alert.error {
+        background-color: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+    }
+
+    #previewCard {
+        display: none;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #f0f8ff;
+    }
+
+    #previewCard img {
+        width: 150px;
+        border-radius: 8px;
+    }
+
+    #previewCard div {
+        flex: 1;
+    }
+
+    #previewCard .flex-container {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 14px;
+        color: #004080;
+    }
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h2>Verificación de Certificados</h2>
+    <p class="subtitle">Colegio de Matemáticos del Perú - Región Puno</p>
+
+    <form id="dniForm">
+        <input type="text" id="dni" placeholder="Ingrese DNI del colegiado" required>
+        <button type="submit"><i class="fa-solid fa-search"></i> Consultar</button>
+    </form>
+
+    <div class="alert error" id="errorMsg">
+        ❌ No figura como miembro del Colegio de Matemáticos – Región Puno.
+    </div>
+
+    <div id="previewCard">
+        <div class="flex-container">
+            <img id="fotoColegiado" src="{{ url_for('static', filename='insignia.png') }}" alt="Foto del colegiado">
+            <div>
+                <p><strong>Nombre:</strong> <span id="prevNombre"></span></p>
+                <p><strong>Colegiatura:</strong> <span id="prevColegiatura"></span></p>
+                <p><strong>Condición:</strong> <span id="prevCondicion"></span></p>
+                <p><strong>Vigencia:</strong> <span id="prevVigencia"></span></p>
+                <p><strong>Emitido:</strong> <span id="prevFecha"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Colegio de Matemáticos del Perú Región Puno<br>
+        Plataforma oficial de verificación
+    </footer>
+</div>
+
+<script>
+const dniForm = document.getElementById("dniForm");
+const errorMsg = document.getElementById("errorMsg");
+const previewCard = document.getElementById("previewCard");
+
+const prevNombre = document.getElementById("prevNombre");
+const prevColegiatura = document.getElementById("prevColegiatura");
+const prevCondicion = document.getElementById("prevCondicion");
+const prevVigencia = document.getElementById("prevVigencia");
+const prevFecha = document.getElementById("prevFecha");
+const foto = document.getElementById("fotoColegiado");
+
+dniForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const dni = document.getElementById("dni").value.trim();
+
+    if(!dni){
+        alert("Por favor ingrese un DNI");
+        return;
+    }
+
+    try {
+        const res = await fetch("/buscar_dni_publico", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ dni })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            errorMsg.style.display = "none";
+            previewCard.style.display = "flex";
+
+            prevNombre.textContent = data.nombres_apellidos;
+            prevColegiatura.textContent = data.colegiatura;
+            prevCondicion.textContent = data.condicion;
+            prevVigencia.textContent = data.vigencia;
+            prevFecha.textContent = data.emitido;
+
+            foto.src = data.foto_url;
+        } else {
+            previewCard.style.display = "none";
+            errorMsg.style.display = "block";
+        }
+
+    } catch (err) {
+        previewCard.style.display = "none";
+        errorMsg.style.display = "block";
+        errorMsg.textContent = "❌ Error al consultar, intente nuevamente";
+        console.error(err);
+    }
+});
+</script>
+
+</body>
+</html>

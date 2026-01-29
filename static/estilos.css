@@ -1,0 +1,117 @@
+/* ===== GENERAL ===== */
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: #ffffffee;
+    padding: 35px 30px;
+    border-radius: 18px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* ===== TEXTOS ===== */
+h2 {
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #34495e;
+    margin-bottom: 25px;
+}
+
+/* ===== FORMULARIOS ===== */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input, select {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+input:focus, select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 6px rgba(52,152,219,0.4);
+    outline: none;
+}
+
+/* ===== BOTONES ===== */
+button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background-color: #3498db;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+    transform: scale(1.03);
+}
+
+/* ===== ALERTAS ===== */
+.alert {
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+}
+
+.alert.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* ===== PREVIEW PUBLICO ===== */
+#previewCard {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 15px;
+    background-color: #f1f1f1;
+    text-align: left;
+}
+
+#previewCard img {
+    width: 90px;
+    float: right;
+    border-radius: 8px;
+}
+
+/* ===== FOOTER ===== */
+footer {
+    margin-top: 25px;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+
+#info_container {
+    display: flex;
+    align-items: flex-start; /* Alinea arriba */
+    gap: 20px; /* Espacio entre datos y foto */
+}
+
+#foto_persona {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    display: none; /* Se mostrará solo si hay foto */
+    width: 150px;
+}

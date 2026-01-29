@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Acceso Decano - COMAP</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+        background: url('{{ url_for("static", filename="fondo_condor.jpg") }}') no-repeat center center fixed;
+        background-size: cover;
+    }
+    .container {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(8px);
+        max-width: 600px;
+        margin: 60px auto;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+        position: relative;
+        z-index: 2;
+    }
+    h2 { text-align:center; margin-bottom:30px; font-size:28px; color:#003366; text-shadow:1px 1px 2px rgba(0,0,0,0.2); }
+    label { display:block; margin-top:15px; font-weight:bold; color:#004080; }
+    input, select, button {
+        width:100%; padding:12px; margin-top:6px; border-radius:8px; border:1px solid #ccc; font-size:16px;
+        transition: all 0.3s ease;
+    }
+    input:focus, select:focus { outline:none; border-color:#0066cc; box-shadow:0 0 8px rgba(0,102,204,0.3); }
+    button {
+        background: linear-gradient(135deg,#004080,#0066cc); color:white; font-weight:bold; border:none; cursor:pointer;
+        margin-top:25px; transition: all 0.3s ease; box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    }
+    button:hover { background: linear-gradient(135deg,#0066cc,#004080); transform: translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.3); }
+    #vista_vigencia,#nombre_persona,#dni_persona { font-weight:bold; color:#004080; }
+    a { display:block; text-align:center; margin-top:20px; color:#004080; font-weight:bold; }
+    a:hover { text-decoration:underline; }
+
+    /* AUTOCOMPLETE */
+    #sugerencias li { padding:8px; cursor:pointer; border-bottom:1px solid #eee; }
+    #sugerencias li:hover { background-color:#f0f8ff; }
+    #sugerencias {
+        list-style:none; padding:0; margin:5px 0 0 0; max-height:120px; overflow-y:auto;
+        border:1px solid #ccc; display:none; background:#fff; border-radius:6px;
+    }
+
+    /* FOTO */
+    #foto_persona { max-width:200px; display:none; border-radius:8px; margin-top:10px; border:1px solid #ccc; }
+
+    /* MODAL */
+    .modal {
+        display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%;
+        background: rgba(0,0,0,0.65); display:flex; justify-content:center; align-items:center; animation:fadeIn 0.3s ease;
+    }
+    .modal-content {
+        background:#fff; padding:30px; border-radius:14px; max-width:450px; text-align:center;
+        box-shadow:0 12px 30px rgba(0,0,0,0.4); transform:translateY(-20px); animation:slideUp 0.4s ease forwards;
+    }
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    @keyframes slideUp { from {opacity:0; transform:translateY(-20px);} to {opacity:1; transform:translateY(0);} }
+    .modal h3 { color:#d9534f; margin-bottom:18px; font-size:22px; }
+    .modal p { font-size:16px; margin-bottom:20px; line-height:1.5; }
+    .modal button {
+        width:48%; margin:8px 2%; padding:12px; font-weight:bold; border-radius:8px; border:none; cursor:pointer; transition:all 0.3s ease;
+    }
+    #cancelBtn { background:#ccc; color:#333; }
+    #cancelBtn:hover { background:#999; color:white; }
+    #confirmBtn { background:linear-gradient(135deg,#d9534f,#c9302c); color:white; }
+    #confirmBtn:hover { background:linear-gradient(135deg,#c9302c,#a92723); }
+
+    /* ---------------- DATOS Y FOTO AL COSTADO ---------------- */
+#info_container {
+    display: flex;
+    align-items: flex-start; /* Alinea arriba */
+    gap: 20px; /* Espacio entre datos y foto */
+}
+
+#foto_persona {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    display: none; /* Se mostrará solo si hay foto */
+    width: 150px;
+}
+
+</style>
+
+
+<body>
+<div class="container login">
+
+    <h2>Acceso Restringido</h2>
+    <p class="subtitle">Panel del Decano</p>
+
+    {% if error %}
+        <div class="alert error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+        <input type="text" name="usuario" placeholder="Usuario" required>
+        <input type="password" name="clave" placeholder="Contraseña" required>
+
+        <button type="submit">
+            <i class="fa-solid fa-lock"></i> Ingresar
+        </button>
+    </form>
+
+    <footer>
+        &copy; 2026 Colegio de Matemáticos del Perú - Región Puno
+    </footer>
+
+</div>
+</body>
+</html>
