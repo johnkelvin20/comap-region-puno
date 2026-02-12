@@ -53,12 +53,15 @@ def buscar_persona_por_dni(dni):
 
 def buscar_personas_por_nombre(texto):
     registros = sheet.get_all_records(value_render_option="FORMATTED_VALUE")
+
     resultados = []
     for i, r in enumerate(registros, start=2):
-        if texto.lower() in r["nombres_apellidos"].lower():
+        if texto.lower() in str(r.get("nombres_apellidos","")).lower():
+            dni_sheet = str(r.get("DNI","")).strip().zfill(8)
+
             resultados.append({
-                "nombres_apellidos": r["nombres_apellidos"],
-                "DNI": r["DNI"],
+                "nombres_apellidos": r.get("nombres_apellidos",""),
+                "DNI": dni_sheet,  # ✅ ahora SI mantiene 0 adelante
                 "vigencia": r.get("vigencia",""),
                 "colegiatura": r.get("colegiatura",""),
                 "foto_url": r.get("foto_url") or "/static/avatar_neutro_carnet.png",
@@ -115,7 +118,7 @@ def guardar_historial(persona):
     historial.append_row([
         ahora.strftime("%d/%m/%Y"),
         ahora.strftime("%H:%M:%S"),
-        persona["DNI"],
+        str(persona.get("DNI","")).strip().zfill(8),
         persona["nombres_apellidos"],
         persona.get("colegiatura",""),
         vigencia_a_texto(persona.get("vigencia",""))

@@ -136,7 +136,7 @@ def actualizar_vigencia_admin():
 @app.route("/pdf", methods=["POST"])
 def generar_pdf():
 
-    dni = (request.form.get("dni") or "").strip()
+    dni = (request.form.get("dni") or "").strip().zfill(8)
     vigencia_raw = (request.form.get("fecha_vencimiento_input") or "").strip()
 
     if not dni or not vigencia_raw:

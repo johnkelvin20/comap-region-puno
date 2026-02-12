@@ -16,7 +16,11 @@ def buscar_dni_publico_view():
 
     historial = client.open_by_key("14gRL3ijGFaxbgOeeuOPgzyKdX3Td7-jyiseS9cnAX6w").worksheet("HISTORIAL")
     registros = historial.get_all_records(value_render_option="FORMATTED_VALUE")
-    registros_dni = [r for r in registros if str(r["DNI"]) == str(dni)]
+    dni = str(dni).strip().zfill(8)
+    registros_dni = [
+        r for r in registros
+        if str(r.get("DNI","")).strip().zfill(8) == dni
+    ]
     if registros_dni:
         ultimo = registros_dni[-1]
         emitido = f"{ultimo.get('Fecha','—')} {ultimo.get('Hora','—')}"
