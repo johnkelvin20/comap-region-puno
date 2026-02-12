@@ -316,13 +316,24 @@ body::before{
 
 /* En móvil vuelve a 1 columna */
 @media (max-width: 720px){
+  /* ✅ En móvil usamos flex para poder reordenar */
   .main-grid{
-    grid-template-columns: 1fr;
+    display: flex;              /* permite usar "order" */
+    flex-direction: column;     /* una sola columna */
   }
+
+  /* ✅ En móvil el sticky se desactiva */
   .sticky-actions{
     position: static;
+    order: 1;                   /* ✅ ACCESOS PRIMERO */
+  }
+
+  /* ✅ La columna izquierda (comunicados) pasa después */
+  .main-grid > div:first-child{
+    order: 2;                   /* ✅ COMUNICADOS DESPUÉS */
   }
 }
+
 
 </style>
  
