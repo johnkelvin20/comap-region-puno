@@ -88,6 +88,23 @@
     width: 150px;
 }
 
+
+.btn-cerrar {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #999, #666);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-cerrar:hover {
+    background: linear-gradient(135deg, #666, #444);
+}
+ 
 </style>
 
 
@@ -110,10 +127,29 @@
         </button>
     </form>
 
+
+    <!-- 🔴 BOTÓN CERRAR VENTANA (AGREGAR AQUÍ) -->
+    <button type="button" class="btn-cerrar" onclick="cerrarVentana()">
+        ❌ Cerrar ventana
+    </button>
+
     <footer>
         &copy; 2026 Colegio de Matemáticos del Perú - Región Puno
     </footer>
 
+
 </div>
+
+<script>
+function cerrarVentana() {
+    window.location.href = "/";
+}
+</script>
+
+
+
+
 </body>
+
+
 </html>

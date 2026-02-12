@@ -1,17 +1,12 @@
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-
-SHEET_ID = "14gRL3ijGFaxbgOeeuOPgzyKdX3Td7-jyiseS9cnAX6w"
-
-scope = [
-    "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/drive"
-]
-
 import os
 import json
 import gspread
+from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials
+
+
+SHEET_ID = "14gRL3ijGFaxbgOeeuOPgzyKdX3Td7-jyiseS9cnAX6w"
+
 
 # Define el scope de Google Sheets
 scope = [
@@ -44,35 +39,60 @@ def buscar_persona_por_dni(dni):
     return None
 
 
-def buscar_persona_por_dni(dni):
-    registros = sheet.get_all_records()
-    for i, r in enumerate(registros, start=2):
-        if str(r["DNI"]) == str(dni):
-            r["_fila"] = i
-            return r
-    return None
-
 def buscar_personas_por_nombre(texto):
     registros = sheet.get_all_records()
     resultados = []
-    for r in registros:
+    for i, r in enumerate(registros, start=2):
         if texto.lower() in r["nombres_apellidos"].lower():
             resultados.append({
                 "nombres_apellidos": r["nombres_apellidos"],
                 "DNI": r["DNI"],
-                "foto_url": r.get("foto_url", "")
+                "vigencia": r.get("vigencia",""),
+                "colegiatura": r.get("colegiatura",""),
+                "foto_url": r.get("foto_url") or "/static/avatar_neutro_carnet.png",
+                "fila": i
             })
     return resultados
-from datetime import datetime
+
+
 
 def actualizar_vigencia(fila, vigencia):
-    """
-    Actualiza la columna 'vigencia' de una persona en Google Sheets.
-    """
-    headers = sheet.row_values(1)
-    if "vigencia" in headers:
+    try:
+        if not fila or int(fila) < 2:
+            print("❌ Fila inválida:", fila)
+            return False
+
+        headers = sheet.row_values(1)
+
+        if "vigencia" not in headers:
+            print("❌ Columna 'vigencia' no existe")
+            return False
+
         col = headers.index("vigencia") + 1
-        sheet.update_cell(fila, col, vigencia.upper())
+        sheet.update_cell(int(fila), col, vigencia.upper())
+
+        print("✅ Vigencia actualizada en fila", fila)
+        return True
+
+    except Exception as e:
+        print("❌ Error al actualizar vigencia:", e)
+        return False
+
+def vigencia_a_texto(vigencia):
+    """
+    Convierte '28/02/2026' → 'FEBRERO DE 2026'
+    """
+    try:
+        fecha = datetime.strptime(vigencia, "%d/%m/%Y")
+        meses = [
+            "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
+            "JULIO", "AGOSTO", "SETIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
+        ]
+        mes = meses[fecha.month - 1]
+        return f"{mes} DE {fecha.year}"
+    except Exception:
+        return str(vigencia).upper()
+
 
 def guardar_historial(persona):
     """
@@ -86,5 +106,124 @@ def guardar_historial(persona):
         persona["DNI"],
         persona["nombres_apellidos"],
         persona.get("colegiatura",""),
-        persona.get("vigencia","")
+        vigencia_a_texto(persona.get("vigencia",""))
     ])
+
+
+def leer_comunicados(limit_anteriores=10):
+    """
+    (Función nueva)
+    ✅ Lee la hoja/pestaña 'COMUNICADOS' del mismo Google Sheet
+    ✅ Devuelve:
+       - principal: el comunicado con activo=TRUE (o el más reciente si no hay TRUE)
+       - anteriores: lista de comunicados para mostrar como historial
+    """
+
+    # Abrimos la pestaña COMUNICADOS (dentro del mismo Google Sheet)
+    ws = client.open_by_key(SHEET_ID).worksheet("COMUNICADOS")
+
+    # Trae todas las filas como lista de diccionarios usando la fila 1 como encabezados
+    rows = ws.get_all_records()
+
+    # Limpiamos datos vacíos y normalizamos (por seguridad)
+    data = []
+    for r in rows:
+        texto = str(r.get("texto", "")).strip()
+        if not texto:
+            continue  # si no hay texto, no sirve como comunicado
+
+        # Convertimos "TRUE/FALSE" a booleano real
+        activo_raw = str(r.get("activo", "")).strip().lower()
+        activo = activo_raw in ("true", "1", "si", "sí", "x")
+
+        data.append({
+            "activo": activo,
+            "fecha": str(r.get("fecha", "")).strip(),   # recomendado: YYYY-MM-DD
+            "titulo": str(r.get("titulo", "")).strip() or "COMUNICADO OFICIAL",
+            "texto": texto,
+            "autor": str(r.get("autor", "")).strip() or "DECANATO COMAP",
+            "link": str(r.get("link", "")).strip(),
+        })
+
+    # Si no hay comunicados válidos, devolvemos vacío (tu app hará fallback)
+    if not data:
+        return None, []
+
+    # Ordenamos por fecha (más reciente primero) si está en formato YYYY-MM-DD
+    def _key_fecha(x):
+        try:
+            return datetime.strptime(x["fecha"], "%Y-%m-%d")
+        except Exception:
+            return datetime.min
+
+    data.sort(key=_key_fecha, reverse=True)
+
+    # Principal = el que tenga activo=True. Si no existe, usamos el más reciente.
+    principal = next((x for x in data if x["activo"]), data[0])
+
+    # Anteriores = todos menos el principal (limitado)
+    anteriores = [x for x in data if x is not principal][:limit_anteriores]
+
+    return principal, anteriores
+
+
+
+def leer_comunicados(limit_anteriores=10):
+    """
+    Lee la hoja/pestaña COMUNICADOS del mismo Google Sheet.
+    Devuelve:
+      - principal (dict): comunicado activo (TRUE) o el más reciente
+      - anteriores (list[dict]): comunicados para mostrar como "anteriores"
+    """
+    ws = client.open_by_key(SHEET_ID).worksheet("COMUNICADOS")
+    rows = ws.get_all_records()
+
+    data = []
+    for r in rows:
+        # (1) Ignorar filas vacías
+        texto = str(r.get("texto", "")).strip()
+        if not texto:
+            continue
+
+        # (2) Convertir activo a booleano
+        activo_raw = str(r.get("activo", "")).strip().lower()
+        activo = activo_raw in ("true", "1", "si", "sí", "x")
+
+        # (3) Guardar todas las columnas que necesitaremos en HTML
+        data.append({
+            "activo": activo,
+            "fecha": str(r.get("fecha", "")).strip(),
+            "titulo": str(r.get("titulo", "")).strip(),  # <- IMPORTANTE: título del número de comunicado
+            "texto": texto,
+            "autor": str(r.get("autor", "")).strip(),
+            "link": str(r.get("link", "")).strip(),
+        })
+
+    if not data:
+        return None, []
+
+    # Ordenar por fecha (YYYY-MM-DD) desc
+    def _key_fecha(x):
+        try:
+            return datetime.strptime(x["fecha"], "%Y-%m-%d")
+        except Exception:
+            return datetime.min
+
+    data.sort(key=_key_fecha, reverse=True)
+
+    # Principal: el activo TRUE; si no hay, el más reciente
+    principal = next((x for x in data if x["activo"]), data[0])
+
+    # Anteriores: todo menos el principal
+    anteriores = [x for x in data if x is not principal][:limit_anteriores]
+
+    # Defaults por si alguna columna viene vacía
+    principal["titulo"] = principal["titulo"] or "COMUNICADO OFICIAL"
+    principal["autor"] = principal["autor"] or "DECANATO COMAP"
+
+    for a in anteriores:
+        a["titulo"] = a["titulo"] or "COMUNICADO"
+        a["autor"] = a["autor"] or "DECANATO COMAP"
+
+    return principal, anteriores
+

@@ -90,10 +90,15 @@
         background: #f0f8ff;
     }
 
-    #previewCard img {
-        width: 150px;
-        border-radius: 8px;
+    #previewCard img.foto-carnet {
+    width: 130px;
+    height: 170px;      /* formato carnet 3:4 aprox */
+    object-fit: cover;  /* recorta sin deformar */
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f2f2f2;
     }
+
 
     #previewCard div {
         flex: 1;
@@ -111,6 +116,19 @@
         font-size: 14px;
         color: #004080;
     }
+
+    .btn-cerrar {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #999, #666);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
 </style>
 </head>
 
@@ -130,7 +148,7 @@
 
     <div id="previewCard">
         <div class="flex-container">
-            <img id="fotoColegiado" src="{{ url_for('static', filename='insignia.png') }}" alt="Foto del colegiado">
+            <img id="fotoColegiado" class="foto-carnet" src="{{ url_for('static', filename='avatar_neutro_carnet.png') }}" alt="Foto del colegiado">
             <div>
                 <p><strong>Nombre:</strong> <span id="prevNombre"></span></p>
                 <p><strong>Colegiatura:</strong> <span id="prevColegiatura"></span></p>
@@ -141,6 +159,9 @@
         </div>
     </div>
 
+    <button type="button" class="btn-cerrar" onclick="cerrarVentana()">
+    ❌ Cerrar ventana
+    </button>
     <footer>
         &copy; 2026 Colegio de Matemáticos del Perú Región Puno<br>
         Plataforma oficial de verificación
@@ -188,7 +209,8 @@ dniForm.addEventListener("submit", async (e) => {
             prevVigencia.textContent = data.vigencia;
             prevFecha.textContent = data.emitido;
 
-            foto.src = data.foto_url;
+            foto.src = data.foto_url || "/static/avatar_neutro_carnet.png";
+            foto.onerror = () => { foto.src = "/static/avatar_neutro_carnet.png"; };
         } else {
             previewCard.style.display = "none";
             errorMsg.style.display = "block";
@@ -201,6 +223,11 @@ dniForm.addEventListener("submit", async (e) => {
         console.error(err);
     }
 });
+</script>
+<script>
+function cerrarVentana() {
+    window.location.href = "/";
+}
 </script>
 
 </body>

@@ -12,7 +12,7 @@ def buscar_dni_publico_view():
         return jsonify({"success": False})
 
     vigencia = persona.get("vigencia", "").upper()
-    foto_url = persona.get("foto_url", "/static/insignia.png")
+    foto_url = persona.get("foto_url") or "/static/avatar_neutro_carnet.png"
 
     historial = client.open_by_key("14gRL3ijGFaxbgOeeuOPgzyKdX3Td7-jyiseS9cnAX6w").worksheet("HISTORIAL")
     registros = historial.get_all_records()

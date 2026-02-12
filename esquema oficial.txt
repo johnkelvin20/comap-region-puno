@@ -6,16 +6,26 @@ certificados_flask/
 ├── admin.py                <-- Lógica de administración y búsquedas admin
 ├── publico.py              <-- Lógica de consulta pública
 ├── overlay_pdf.py          <-- Funciones PDF (crear_overlay_pdf, fusionar_pdfs)
-├── plantilla.pdf           <-- Plantilla base del certificado
+├── plantilla1.pdf           <-- Plantilla base del certificado con firma
+├── plantilla2.pdf           <-- Plantilla base del certificado sin firma
 ├── OLDENGL.TTF             <-- Fuente para PDF
 ├── credenciales.json       <-- Google Sheets
 │
 ├── static/
 │   ├── fotos/
+│   │	├── 73624373.png
+│   │	├── 73624375.png
+│   │	└── 73624376.png
 │   ├── estilos.css
-│   ├── fondo_inicio.jpg
+│   ├── fondo_condor.jpg
 │   ├── banner_comap.jpg
+│   ├── fondo_inicio.jpg
+│   ├── fondo_edificio.jpg
+│   ├── fondo_paisaje.jpg
+│   ├── insigniaCOMAP.png
+│   ├── plazapuno.jpg
 │   └── insignia.png
+│   
 │
 └── templates/
     ├── inicio.html          <-- Ventana principal
