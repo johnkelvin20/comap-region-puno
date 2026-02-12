@@ -15,7 +15,7 @@ def buscar_dni_publico_view():
     foto_url = persona.get("foto_url") or "/static/avatar_neutro_carnet.png"
 
     historial = client.open_by_key("14gRL3ijGFaxbgOeeuOPgzyKdX3Td7-jyiseS9cnAX6w").worksheet("HISTORIAL")
-    registros = historial.get_all_records()
+    registros = historial.get_all_records(value_render_option="FORMATTED_VALUE")
     registros_dni = [r for r in registros if str(r["DNI"]) == str(dni)]
     if registros_dni:
         ultimo = registros_dni[-1]

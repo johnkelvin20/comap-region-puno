@@ -32,16 +32,27 @@ sheet = client.open_by_key(SHEET_ID).sheet1
 
 # Función para buscar persona por DNI
 def buscar_persona_por_dni(dni):
-    registros = sheet.get_all_records()
+    dni = str(dni).strip()
+
+    registros = sheet.get_all_records(
+        value_render_option="FORMATTED_VALUE"
+    )
+
     for i, r in enumerate(registros, start=2):
-        if str(r["DNI"]) == str(dni):
+        dni_sheet = str(r.get("DNI", "")).strip()
+
+        # 🔐 Comparación segura con ceros
+        if dni_sheet.zfill(8) == dni.zfill(8):
             r["_fila"] = i
             return r
+
     return None
 
 
+
+
 def buscar_personas_por_nombre(texto):
-    registros = sheet.get_all_records()
+    registros = sheet.get_all_records(value_render_option="FORMATTED_VALUE")
     resultados = []
     for i, r in enumerate(registros, start=2):
         if texto.lower() in r["nombres_apellidos"].lower():
