@@ -2,6 +2,7 @@ import os
 import json
 import gspread
 from datetime import datetime
+from zoneinfo import ZoneInfo  # ✅ zona horaria (Python 3.9+)
 from oauth2client.service_account import ServiceAccountCredentials
 
 
@@ -99,7 +100,7 @@ def guardar_historial(persona):
     Guarda en la hoja HISTORIAL la emisión del certificado.
     """
     historial = client.open_by_key(SHEET_ID).worksheet("HISTORIAL")
-    ahora = datetime.now()
+    ahora = datetime.now(ZoneInfo("America/Lima"))  # ✅ hora Perú
     historial.append_row([
         ahora.strftime("%d/%m/%Y"),
         ahora.strftime("%H:%M:%S"),
@@ -110,61 +111,6 @@ def guardar_historial(persona):
     ])
 
 
-def leer_comunicados(limit_anteriores=10):
-    """
-    (Función nueva)
-    ✅ Lee la hoja/pestaña 'COMUNICADOS' del mismo Google Sheet
-    ✅ Devuelve:
-       - principal: el comunicado con activo=TRUE (o el más reciente si no hay TRUE)
-       - anteriores: lista de comunicados para mostrar como historial
-    """
-
-    # Abrimos la pestaña COMUNICADOS (dentro del mismo Google Sheet)
-    ws = client.open_by_key(SHEET_ID).worksheet("COMUNICADOS")
-
-    # Trae todas las filas como lista de diccionarios usando la fila 1 como encabezados
-    rows = ws.get_all_records()
-
-    # Limpiamos datos vacíos y normalizamos (por seguridad)
-    data = []
-    for r in rows:
-        texto = str(r.get("texto", "")).strip()
-        if not texto:
-            continue  # si no hay texto, no sirve como comunicado
-
-        # Convertimos "TRUE/FALSE" a booleano real
-        activo_raw = str(r.get("activo", "")).strip().lower()
-        activo = activo_raw in ("true", "1", "si", "sí", "x")
-
-        data.append({
-            "activo": activo,
-            "fecha": str(r.get("fecha", "")).strip(),   # recomendado: YYYY-MM-DD
-            "titulo": str(r.get("titulo", "")).strip() or "COMUNICADO OFICIAL",
-            "texto": texto,
-            "autor": str(r.get("autor", "")).strip() or "DECANATO COMAP",
-            "link": str(r.get("link", "")).strip(),
-        })
-
-    # Si no hay comunicados válidos, devolvemos vacío (tu app hará fallback)
-    if not data:
-        return None, []
-
-    # Ordenamos por fecha (más reciente primero) si está en formato YYYY-MM-DD
-    def _key_fecha(x):
-        try:
-            return datetime.strptime(x["fecha"], "%Y-%m-%d")
-        except Exception:
-            return datetime.min
-
-    data.sort(key=_key_fecha, reverse=True)
-
-    # Principal = el que tenga activo=True. Si no existe, usamos el más reciente.
-    principal = next((x for x in data if x["activo"]), data[0])
-
-    # Anteriores = todos menos el principal (limitado)
-    anteriores = [x for x in data if x is not principal][:limit_anteriores]
-
-    return principal, anteriores
 
 
 
