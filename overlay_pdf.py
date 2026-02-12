@@ -3,6 +3,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from datetime import datetime
+from zoneinfo import ZoneInfo  # ✅ Zona horaria Perú
 from io import BytesIO
 from pypdf import PdfReader, PdfWriter
 
@@ -52,7 +53,7 @@ def crear_overlay_pdf(datos):
         "enero","febrero","marzo","abril","mayo","junio",
         "julio","agosto","septiembre","octubre","noviembre","diciembre"
     ]
-    hoy = datetime.now()
+    hoy = datetime.now(ZoneInfo("America/Lima"))  # ✅ Hora Perú
     fecha = f"Puno, {hoy.day} de {meses[hoy.month-1]} de {hoy.year}"
 
     c.setFont("Times-Roman", 20)
