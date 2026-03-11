@@ -51,6 +51,7 @@ def buscar_persona_por_dni(dni):
 
 
 
+
 def buscar_personas_por_nombre(texto):
     registros = sheet.get_all_records(value_render_option="FORMATTED_VALUE")
 
@@ -60,6 +61,7 @@ def buscar_personas_por_nombre(texto):
             dni_sheet = str(r.get("DNI","")).strip().zfill(8)
 
             resultados.append({
+                "emitido": obtener_ultima_emision(dni_sheet),
                 "nombres_apellidos": r.get("nombres_apellidos",""),
                 "DNI": dni_sheet,  # ✅ ahora SI mantiene 0 adelante
                 "vigencia": r.get("vigencia",""),
@@ -125,6 +127,36 @@ def guardar_historial(persona):
     ])
 
 
+def obtener_ultima_emision(dni):
+    """
+    ✅ NUEVO:
+    Devuelve la última fecha+hora de emisión del DNI consultando la hoja HISTORIAL.
+    Si no existe, devuelve "" (vacío).
+    """
+    try:
+        ws = client.open_by_key(SHEET_ID).worksheet("HISTORIAL")
+
+        # IMPORTANTE: leer como texto
+        rows = ws.get_all_records(value_render_option="FORMATTED_VALUE")
+
+        dni_in = str(dni).strip().zfill(8)
+
+        # Recorremos desde el final para encontrar la más reciente
+        for r in reversed(rows):
+            dni_hist = str(r.get("DNI", "")).strip().zfill(8)
+            if dni_hist == dni_in:
+                fecha = str(r.get("fecha", "")).strip()
+                hora = str(r.get("hora", "")).strip()
+
+                if fecha and hora:
+                    return f"{fecha} {hora}"
+                if fecha:
+                    return fecha
+        return ""
+
+    except Exception as e:
+        print("❌ Error leyendo HISTORIAL:", e)
+        return ""
 
 
 
