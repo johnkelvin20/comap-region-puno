@@ -180,8 +180,8 @@ def generar_pdf():
     overlay_sin_firma = BytesIO(overlay_original.getvalue())
 
     # ===== GENERAR LOS DOS PDF =====
-    pdf_con_firma = fusionar_pdfs(overlay_con_firma, "plantilla1.pdf")
-    pdf_sin_firma = fusionar_pdfs(overlay_sin_firma, "plantilla2.pdf")
+    pdf_con_firma = fusionar_pdfs(overlay_con_firma, "plantilla5.pdf")
+    pdf_sin_firma = fusionar_pdfs(overlay_sin_firma, "plantilla6.pdf")
     fecha_hoy_archivo = datetime.now().strftime("%Y-%m-%d")
 
     # ===== NOMBRES DE ARCHIVOS =====
